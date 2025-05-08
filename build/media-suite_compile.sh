@@ -2934,7 +2934,7 @@ if [[ $cyanrip = y ]]; then
             config_path=.. do_configure "${FFMPEG_BASE_OPTS[@]}" \
                 --prefix="$LOCALDESTDIR/opt/cyanffmpeg" \
                 --disable-{programs,devices,filters,decoders,hwaccels,encoders,muxers} \
-                --disable-{debug,protocols,demuxers,parsers,doc,swscale,postproc,network} \
+                --disable-{debug,protocols,demuxers,parsers,doc,swscale,network} \
                 --disable-{avdevice,autodetect} \
                 --disable-bsfs --enable-protocol=file,data \
                 --enable-encoder=flac,tta,aac,wavpack,alac,pcm_s16le,pcm_s32le \
