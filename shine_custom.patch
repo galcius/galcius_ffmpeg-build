@@ -1,0 +1,46 @@
+diff --git a/build/media-suite_compile.sh b/build/media-suite_compile.sh
+index 73637c0..c3d0374 100644
+--- a/build/media-suite_compile.sh
++++ b/build/media-suite_compile.sh
+@@ -1140,20 +1140,22 @@ fi
+ 
+ _check=(shine/layer3.h libshine.{,l}a shine.pc)
+ [[ $standalone = y ]] && _check+=(bin-audio/shineenc.exe)
+-if enabled libshine && do_pkgConfig "shine = 3.1.1" &&
+-    do_wget -h 58e61e70128cf73f88635db495bfc17f0dde3ce9c9ac070d505a0cd75b93d384 \
+-        "https://github.com/toots/shine/releases/download/3.1.1/shine-3.1.1.tar.gz"; then
++if enabled libshine && do_pkgConfig "shine = 3.1.1" && do_vcs "$SOURCE_REPO_SHINE"; then
+     do_uninstall "${_check[@]}"
+     [[ $standalone = n ]] && sed -i '/bin_PROGRAMS/,+4d' Makefile.am
+     # fix out-of-root build
+     # shellcheck disable=SC2016
+-    sed -ri -e 's;(libshine.sym)$;$(srcdir)/\1;' \
+-        -e '/libshine_la_HEADERS/{s;(src/lib);$(srcdir)/\1;}' \
+-        -e '/shineenc_CFLAGS/{s;(src/lib);$(srcdir)/\1;}' Makefile.am
+-    rm configure
+-    do_autoreconf
+-    do_separate_confmakeinstall audio
+-    do_checkIfExist
++    cd shine
++	git stash && git pull
++	mkdir build64
++	./bootstrap
++	autoreconf -fiv
++	cd build64
++	../configure --prefix=/local64 --disable-shared --enable-static
++	cp ../libshine.sym .
++	make CFLAGS="-I../src/lib" -j$(nproc)
++	make install
++	
+ fi
+ 
+ _check=(openal.pc libopenal.a)
+diff --git a/build/media-suite_deps.sh b/build/media-suite_deps.sh
+index 83e396d..0fb93da 100644
+--- a/build/media-suite_deps.sh
++++ b/build/media-suite_deps.sh
+@@ -128,3 +128,4 @@ SOURCE_REPO_ZLIBCLOUDFLARE=https://github.com/cloudflare/zlib.git
+ SOURCE_REPO_ZLIBNG=https://github.com/zlib-ng/zlib-ng.git
+ SOURCE_REPO_ZLIBRS=https://github.com/trifectatechfoundation/zlib-rs.git
+ SOURCE_REPO_ZVBI=https://github.com/zapping-vbi/zvbi.git
++SOURCE_REPO_SHINE=https://github.com/toots/shine.git
